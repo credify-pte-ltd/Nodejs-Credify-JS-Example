@@ -1,0 +1,16 @@
+{
+  "name": "nodejs-credify-js",
+  "version": "0.1.0",
+  "description": "Node.js example project of Credify JS",
+  "main": "app.js",
+  "author": "@ngo275",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "@credify/credify-js": "^1.2.0",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1"
+  }
+}
