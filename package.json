@@ -1,12 +1,19 @@
 {
-  "name": "nodejs-credify-js",
+  "name": "credify-nodejs-sample",
   "version": "0.1.0",
-  "description": "Node.js example project of Credify JS",
+  "description": "Example project of Credify Node.js",
   "main": "app.js",
   "author": "@ngo275",
+  "license": "MIT",
   "scripts": {
     "start": "node app.js"
   },
+  "engines": {
+    "node": ">=10.x"
+  },
+  "keywords": [
+    "credify"
+  ],
   "dependencies": {
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
