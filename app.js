@@ -55,11 +55,11 @@ app.get("/oidc", async (req, res) => {
   const state = Math.random().toString();
   const options = { state };
   if (req.query.phone_number) {
-    options["phone_number"] = req.query.phone_number;
+    options.phoneNumber = req.query.phone_number;
   } else if (req.query.entity_id) {
-    options["entity_id"] = req.query.entity_id;
+    options.userId = req.query.entity_id;
   }
-  console.log(req);
+  console.log(req.query);
 
   const { oidcUrl, privateKey } = await credify.oidc.initiateOIDC(organizationId, redirectUrl, scopes, options);
 
