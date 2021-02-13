@@ -6,7 +6,7 @@ const Credify = require("credify-nodejs");
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
-const port = 8000;
+const port = process.env.PORT;
 
 
 ///////////////////////////////////////////////////////
