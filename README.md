@@ -12,7 +12,7 @@ This project demonstrates 2 roles; data provider and data receiver.
 
 #### `GET: /data-receiver/demo-user`
 
-This returns mocked users like following.
+This returns a random user like following.
 
 ```json
 {
@@ -33,7 +33,7 @@ This returns mocked users like following.
 
 #### `POST: /data-provider/create`
 
-This generates set up data provision with this data provider's data, BUT this data remains in the data providing service.
+This sets up data provision of a specified user with this data provider's data, BUT the data remains in the data providing service, not in Credify.
 
 Request body:
 
@@ -55,7 +55,7 @@ Response body:
 
 #### `POST: /data-provider/user-counts`
 
-This returns the total count of eligible users that satisfies a specified criteria.
+This returns a total count of eligible users that satisfies a specified criteria.
 
 [Detailed spec is here](https://developers.credify.one/how-to-use-servicex/be-data-provider.html#user-counts-api).
 
@@ -67,10 +67,11 @@ This returns a result of offer evaluation.
 
 #### `POST: /data-provider/encrypted-claims`
 
-This encrypts passed claim values with a public key of data receivers.
+This encrypts passed claim values with a public key of a data receiver.
 
 [Detailed spec is here](https://developers.credify.one/how-to-use-servicex/be-data-provider.html#encrypted-claims-api).
 
+---
 
 ### Data receiver
 
