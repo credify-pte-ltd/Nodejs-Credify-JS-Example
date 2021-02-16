@@ -12,6 +12,9 @@ app.use(bodyParser.json());
 app.use(cors());
 const port = process.env.PORT || 8000;
 
+console.log(process.env.NODE_ENV);
+console.log(process.env.DATABASE_URL);
+
 ///////////////////////////////////////////////////////
 /// Config for auth
 ///////////////////////////////////////////////////////
