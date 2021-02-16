@@ -6,7 +6,18 @@
   "author": "@ngo275",
   "license": "MIT",
   "scripts": {
-    "start": "node app.js"
+    "start": "DATABASE_URL=$(heroku config:get DATABASE_URL -a dev-credify-sample) node app.js",
+    "dev": "node app.js",
+    "db:setup": "yarn run db:migrate && yarn run db:seed:all",
+    "sequelize": "sequelize --models-path=src/models",
+    "db:create": "yarn run sequelize db:create",
+    "model:create": "yarn run sequelize model:generate",
+    "db:migrate:create": "yarn run sequelize migration:generate",
+    "db:migrate": "yarn run sequelize db:migrate",
+    "db:migrate:redo": "yarn run sequelize db:migrate:undo:all",
+    "db:seed:create": "yarn run sequelize seed:generate",
+    "db:seed:all": "yarn run sequelize db:seed:all",
+    "db:seed:redo": "yarn run sequelize db:seed:undo:all"
   },
   "engines": {
     "node": ">=10.x"
