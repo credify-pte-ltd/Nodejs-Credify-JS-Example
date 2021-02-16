@@ -6,9 +6,9 @@
   "author": "@ngo275",
   "license": "MIT",
   "scripts": {
-    "start": "DATABASE_URL=$(heroku config:get DATABASE_URL -a dev-credify-sample) node app.js",
+    "start": "NODE_ENV=production DATABASE_URL=$(heroku config:get DATABASE_URL -a dev-credify-sample) node app.js",
     "dev": "node app.js",
-    "db:setup": "yarn run db:migrate && yarn run db:seed:all",
+    "db:setup": "DATABASE_URL=$(heroku config:get DATABASE_URL -a dev-credify-sample) yarn run db:migrate && yarn run db:seed:all",
     "sequelize": "sequelize --models-path=src/models",
     "db:create": "yarn run sequelize db:create",
     "model:create": "yarn run sequelize model:generate",
