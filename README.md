@@ -1,8 +1,10 @@
 # Credify Integration Sample (Node.js)
 
+:link: [Developers Documentation](https://developers.credify.one/)
+
 This project is an example project of `credify-nodejs`. You can refer a [React Example Project](https://github.com/credify-pte-ltd/React-Credify-JS-Example), too.
 
-Deployed URL: [http://dev-credify-sample.herokuapp.com/](http://dev-credify-sample.herokuapp.com/)
+Deployed URL: [https://dev-credify-sample.herokuapp.com/](https://dev-credify-sample.herokuapp.com/)
 
 ## Endpoints
 
@@ -33,7 +35,7 @@ This returns a random user like following.
 
 #### `POST: /data-provider/create`
 
-This sets up data provision of a specified user with this data provider's data, BUT the data remains in the data providing service, not in Credify.
+This sets up data provision of a specified user with this data provider's data, BUT the data remains in the data providing service, not in Credify. :closed_lock_with_key:
 
 Request body:
 
