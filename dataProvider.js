@@ -25,10 +25,11 @@ module.exports = ({ db, credify }) => {
   });
 
   api.post("/create", async (req, res) => {
+    if (!req.body.id || !req.body.password) {
+      return res.status(400).send({ message: "Invalid body" });
+    }
+
     try {
-      if (!req.body.id || !req.body.password) {
-        throw new Error("Invalid body.");
-      }
       const internalId = req.body.id;
       const password = req.body.password;
       const user = await db.User.findByPk(internalId);
@@ -74,12 +75,12 @@ module.exports = ({ db, credify }) => {
     res.json(response);
   });
 
-  api.post("/offer-evaluate", async (req, res) => {
-    try {
-      if (!req.body.credify_id || !req.body.conditions) {
-        throw new Error("Invalid body");
-      }
+  api.post("/offer-evaluation", async (req, res) => {
+    if (!req.body.credify_id || !req.body.conditions || !req.body.scopes) {
+      return res.status(400).send({ message: "Invalid body" });
+    }
 
+    try {
       const users = await db.User.findAll({ where: { credifyId: req.body.credify_id } });
       if (users.length !== 1) {
         throw new Error("Not found user properly");
@@ -104,11 +105,16 @@ module.exports = ({ db, credify }) => {
   api.post("/encrypted-claims", async (req, res) => {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.split(" ")) {
-      res.send("Unauthorized");
+      return res.status(401).send("Unauthorized");
     }
     const accessToken = authHeader.split(" ")[1];
-    const requestToken = req.body.requestToken;
-    const approvalToken = req.body.approvalToken;
+
+    if (!req.body.request_token || !req.body.approval_token) {
+      return res.status(400).send({ message: "Invalid body" });
+    }
+
+    const requestToken = req.body.request_token;
+    const approvalToken = req.body.approval_token;
     try {
       const { publicKey, scopes } = await credify.claims.validateRequest(accessToken, requestToken, approvalToken);
 

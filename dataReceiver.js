@@ -12,8 +12,8 @@ module.exports = ({ db, credify }) => {
     const options = { state };
     if (req.query.phone_number) {
       options.phoneNumber = req.query.phone_number;
-    } else if (req.query.entity_id) {
-      options.userId = req.query.entity_id;
+    } else if (req.query.credify_id) {
+      options.userId = req.query.credify_id;
     } else if (req.query.offer_code) {
       options.offerCode = req.query.offer_code;
     }
@@ -34,6 +34,9 @@ module.exports = ({ db, credify }) => {
   });
 
   api.post("/oidc", async (req, res) => {
+    if (!req.body.access_token || !req.body.state) {
+      return res.status(400).send({ message: "Invalid body" });
+    }
     const accessToken = req.body.access_token;
     const state = req.body.state;
 
