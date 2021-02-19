@@ -64,6 +64,35 @@ module.exports = ({ db, credify }) => {
     }
   });
 
+  // This is called by Credify's Backend.
+  api.get("/offers-list", async (req, res) => {
+    const id = req.query.id;
+    if (!id) {
+      return res.status(400).send({ message: "User not found." });
+    }
+
+    try {
+      const offers = await credify.offer.getList();
+
+      if (!offers.length) {
+        return res.send({ offers: [] })
+      }
+
+      // TODO: filter the offers with this user's data and add `evaluation_result`.
+      const user = await db.User.findByPk(id);
+
+      const response = {
+        data: {
+          offers
+        }
+      };
+      res.json(response);
+    } catch (e) {
+      res.status(500).send({ message: e.message });
+    }
+  });
+
+  // This is called by Credify's Backend.
   api.post("/user-counts", async (req, res) => {
     // TODO: query data provider's database to count the number of eligible users.
 
@@ -75,6 +104,7 @@ module.exports = ({ db, credify }) => {
     res.json(response);
   });
 
+  // This is called by Credify's Backend.
   api.post("/offer-evaluation", async (req, res) => {
     if (!req.body.credify_id || !req.body.conditions || !req.body.scopes) {
       return res.status(400).send({ message: "Invalid body" });
@@ -102,6 +132,7 @@ module.exports = ({ db, credify }) => {
     }
   });
 
+  // This is called by Credify's Backend.
   api.post("/encrypted-claims", async (req, res) => {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.split(" ")) {
