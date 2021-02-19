@@ -66,9 +66,9 @@ module.exports = ({ db, credify }) => {
 
   // This is called by Credify's Backend.
   api.get("/offers-list", async (req, res) => {
-    const id = req.query.id;
-    if (!id) {
-      return res.status(400).send({ message: "User not found." });
+    const credifyId = req.query.credify_id;
+    if (!credifyId) {
+      return res.status(400).send({ message: "Query param is not valid" });
     }
 
     try {
@@ -79,7 +79,11 @@ module.exports = ({ db, credify }) => {
       }
 
       // TODO: filter the offers with this user's data and add `evaluation_result`.
-      const user = await db.User.findByPk(id);
+      const users = await db.User.findAll({ where: { credifyId } });
+      if (users.length !== 1) {
+        throw new Error("Not found user properly");
+      }
+      const user = users[0];
 
       const response = {
         data: {
