@@ -55,6 +55,7 @@ Response body:
 }
 ```
 
+
 #### `POST: /data-provider/user-counts`
 
 This returns a total count of eligible users that satisfies a specified criteria.
@@ -72,6 +73,12 @@ This returns a result of offer evaluation.
 This encrypts passed claim values with a public key of a data receiver.
 
 [Detailed spec is here](https://developers.credify.one/how-to-use-servicex/be-data-provider.html#encrypted-claims-api).
+
+#### `GET /data-provider/offers-list`
+
+This returns offers list that are available to a specified user.
+
+[Detailed spec is here](https://developers.credify.one/how-to-use-servicex/be-data-provider.html#offers-list-api).
 
 ---
 
