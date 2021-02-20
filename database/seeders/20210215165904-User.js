@@ -23,6 +23,7 @@ module.exports = {
         phoneCountryCode: "+84",
         creditScore: faker.random.number(500),
         socialScore: faker.random.number(300),
+        transactionsCount: faker.random.number(1000),
         monthlyPaymentAmount: faker.random.number(1000000),
         credifyId: "",
         createdAt: new Date(),

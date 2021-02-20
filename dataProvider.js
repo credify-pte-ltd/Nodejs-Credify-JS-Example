@@ -1,15 +1,7 @@
+import {composeClaimObject, personalizeOffers, scopeNames} from "./utils";
+
 const faker = require("faker");
 const { Router } = require("express");
-
-const claims = {
-  scopenamea: {
-    // NOTE: This needs to be actual user's data.
-    claimnamea: 123,
-  },
-  scopenameb: {
-    claimnameb: "test"
-  },
-};
 
 module.exports = ({ db, credify }) => {
   const api = Router();
@@ -54,7 +46,9 @@ module.exports = ({ db, credify }) => {
       const id = await credify.entity.create(profile, password);
       await user.update({ credifyId: id });
 
+      const claims = composeClaimObject(user, scopeNames);
       const commitments = await credify.claims.push(id, claims);
+
       console.log(commitments);
       // TODO: store 'commitments' to DB
 
@@ -78,17 +72,17 @@ module.exports = ({ db, credify }) => {
         return res.send({ offers: [] })
       }
 
-      // TODO: filter the offers with this user's data and add `evaluation_result`.
       const users = await db.User.findAll({ where: { credifyId } });
       if (users.length !== 1) {
         throw new Error("Not found user properly");
       }
       const user = users[0];
+      const personalizedOffers = personalizeOffers(user, offers);
 
       const response = {
         data: {
-          offers
-        }
+          offers: personalizedOffers,
+        },
       };
       res.json(response);
     } catch (e) {
@@ -144,20 +138,31 @@ module.exports = ({ db, credify }) => {
     }
     const accessToken = authHeader.split(" ")[1];
 
-    if (!req.body.request_token || !req.body.approval_token) {
+    if (!req.body.user_id || !req.body.request_token || !req.body.approval_token) {
       return res.status(400).send({ message: "Invalid body" });
     }
 
+    const credifyId = req.body.user_id;
     const requestToken = req.body.request_token;
     const approvalToken = req.body.approval_token;
     try {
       const { publicKey, scopes } = await credify.claims.validateRequest(accessToken, requestToken, approvalToken);
 
-      // TODO: construct claim object upon the granted scopes.
-      const claims = {};
+      const users = await db.User.findAll({ where: { credifyId } });
+      if (users.length !== 1) {
+        throw new Error("Not found user properly");
+      }
+      const user = users[0];
+
+      const claims = composeClaimObject(user, scopes);
 
       const encrypted = await credify.claims.encrypt(claims, publicKey);
-      res.send(encrypted);
+      const data = {
+        data: {
+          claims: encrypted
+        }
+      };
+      res.send(data);
     } catch (e) {
       res.send(e);
     }

@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     phoneCountryCode: DataTypes.STRING,
     creditScore: DataTypes.INTEGER,
     socialScore: DataTypes.INTEGER,
+    transactionsCount: DataTypes.INTEGER,
     monthlyPaymentAmount: DataTypes.INTEGER,
     credifyId: DataTypes.STRING
   }, {
