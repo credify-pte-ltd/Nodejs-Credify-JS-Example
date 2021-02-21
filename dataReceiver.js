@@ -27,7 +27,7 @@ module.exports = ({ db, credify }) => {
         offerCode: options.offerCode || ""
       });
 
-      res.send({ url: oidcUrl });
+      res.redirect(oidcUrl);
     } catch (e) {
       res.send(e);
     }

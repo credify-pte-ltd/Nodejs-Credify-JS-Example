@@ -110,7 +110,7 @@ module.exports = ({ db, credify }) => {
       let counts = new Array(conditions.length);
 
       users.forEach((user) => {
-        const res = evaluateOffer(user, req.body.conditions, scopeNames);
+        const res = evaluateOffer(user, conditions, scopeNames);
         counts[res.rank - 1] += 1;
       });
 
@@ -143,7 +143,9 @@ module.exports = ({ db, credify }) => {
 
       const response = {
         data: {
-          level: result.rank
+          rank: result.rank,
+          used_scopes: result.usedScopes,
+          required_scopes: result.requiredScopes,
         }
       };
       res.json(response);

@@ -214,7 +214,7 @@ const checkAndCondition = (subconditions, user, usingScopes) => {
     return qualified;
   });
   // All the sub conditions need to meet criterion.
-  return { qualified: subconditions.length === validConditions.length, scopeNames };
+  return { qualified: subconditions.length === validConditions.length, scopeNames: scopeNames.filter(onlyUnique) };
 };
 
 const checkOrCondition = (subconditions, user, usingScopes) => {
@@ -225,7 +225,7 @@ const checkOrCondition = (subconditions, user, usingScopes) => {
     return qualified;
   });
   // One of the sub conditions need to meet criterion.
-  return { qualified: validConditions.length > 0, scopeNames };
+  return { qualified: validConditions.length > 0, scopeNames: scopeNames.filter(onlyUnique) };
 };
 
 const checkNotCondition = (subconditions, user, usingScopes) => {
@@ -238,47 +238,46 @@ const checkNotCondition = (subconditions, user, usingScopes) => {
 
 const evaluateOffer = (user, conditions, usingScopes) => {
   let level = 0;
-  let scopes = [];
+  let usedScopes = [];
+  const requestedScopes = conditions.flatMap((c) => {
+    return c.subconditions.map((c) => c.claim.scope.name)
+  }).filter(onlyUnique);
 
   // Count from the back to find the best level.
   for (let i = conditions.length - 1; i >= 0; i--) {
     const condition = conditions[i];
-    let qualified = false;
-    let scopeNames = [];
     if (condition.kind === "AndCondition") {
       const res = checkAndCondition(condition.subconditions, user, usingScopes);
       if (res.qualified) {
-        qualified = true;
-        scopeNames = res.scopeNames;
+        level = i + 1;
+        usedScopes = res.scopeNames;
+        break;
       }
     } else if (condition.kind === "OrCondition") {
       const res = checkOrCondition(condition.subconditions, user, usingScopes);
       if (res.qualified) {
-        qualified = true;
-        scopeNames = res.scopeNames;
+        level = i + 1;
+        usedScopes = res.scopeNames;
+        break;
       }
     } else if (condition.kind === "NotCondition") {
       const res = checkNotCondition(condition.subconditions, user, usingScopes);
       if (res.qualified) {
-        qualified = true;
-        scopeNames = [res.scopeName];
+        level = i + 1;
+        usedScopes = [res.scopeName];
+        break;
       }
     } else {
       const res = checkValueCondition(condition, user, usingScopes);
       if (res.qualified) {
-        qualified = true;
-        scopeNames = [res.scopeName];
+        level = i + 1;
+        usedScopes = [res.scopeName];
+        break;
       }
-    }
-    if (qualified) {
-      // +1 taking into consideration an index;
-      level = i + 1;
-      scopes = scopeNames;
-      break;
     }
   }
 
-  return { rank: level, scopes: scopes.filter(onlyUnique) };
+  return { rank: level, usedScopes, requiredScopes: requestedScopes };
 };
 
 const personalizeOffers = (user, offers) => {
@@ -291,8 +290,8 @@ const personalizeOffers = (user, offers) => {
       ...offer,
       evaluation_result: {
         rank: result.rank,
-        used_scopes: result.scopes,
-        required_scopes: offer.campaign.consumer.scopes,
+        used_scopes: result.usedScopes,
+        required_scopes: result.requiredScopes,
       }
     };
 
