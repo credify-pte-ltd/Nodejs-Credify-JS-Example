@@ -1,3 +1,7 @@
+const onlyUnique = (value, index, self) => {
+  return self.indexOf(value) === index;
+};
+
 export const scopeNames = ["37c5abfa-a4b7-4521-a312-89a2ec53e804:credit-score", "37c5abfa-a4b7-4521-a312-89a2ec53e804:transactions"];
 const scopesDefinition =
   [
@@ -154,9 +158,15 @@ export const composeClaimObject = (user, scopes) => {
  *
  * @param condition
  * @param user
+ * @param usingScopes Scope name list that user is going to share
  * @returns {{qualified: boolean, scopeName: string}}
  */
-const checkValueCondition = (condition, user) => {
+const checkValueCondition = (condition, user, usingScopes) => {
+  const userDeclined = !usingScopes.includes(condition.claim.scope.name);
+  if (userDeclined) {
+    return { qualified: false, scopeName: condition.claim.scope.name };
+  }
+
   if (condition.kind === "ContainCondition") {
     return { qualified: true, scopeName: condition.claim.scope.name };
   }
@@ -196,10 +206,10 @@ const checkValueCondition = (condition, user) => {
   return { qualified: false, scopeName: condition.claim.scope.name };
 };
 
-const checkAndCondition = (subconditions, user) => {
+const checkAndCondition = (subconditions, user, usingScopes) => {
   const scopeNames = [];
   const validConditions = subconditions.filter((c) => {
-    const { qualified, scopeName } = checkValueCondition(c, user);
+    const { qualified, scopeName } = checkValueCondition(c, user, usingScopes);
     if (qualified) { scopeNames.push(scopeName) }
     return qualified;
   });
@@ -207,10 +217,10 @@ const checkAndCondition = (subconditions, user) => {
   return { qualified: subconditions.length === validConditions.length, scopeNames };
 };
 
-const checkOrCondition = (subconditions, user) => {
+const checkOrCondition = (subconditions, user, usingScopes) => {
   const scopeNames = [];
   const validConditions = subconditions.filter((c) => {
-    const { qualified, scopeName } = checkValueCondition(c, user);
+    const { qualified, scopeName } = checkValueCondition(c, user, usingScopes);
     if (qualified) { scopeNames.push(scopeName) }
     return qualified;
   });
@@ -218,68 +228,78 @@ const checkOrCondition = (subconditions, user) => {
   return { qualified: validConditions.length > 0, scopeNames };
 };
 
-const checkNotCondition = (subconditions, user) => {
+const checkNotCondition = (subconditions, user, usingScopes) => {
   if (subconditions.length !== 1) {
     return false;
   }
-  const { qualified, scopeName } = checkValueCondition(subconditions[0], user);
+  const { qualified, scopeName } = checkValueCondition(subconditions[0], user, usingScopes);
   return { qualified: !qualified, scopeName };
+};
+
+export const evaluateOffer = (user, conditions, usingScopes) => {
+  let level = 0;
+  let scopes = [];
+
+  // Count from the back to find the best level.
+  for (let i = conditions.length - 1; i >= 0; i--) {
+    const condition = conditions[i];
+    let qualified = false;
+    let scopeNames = [];
+    if (condition.kind === "AndCondition") {
+      const res = checkAndCondition(condition.subconditions, user, usingScopes);
+      if (res.qualified) {
+        qualified = true;
+        scopeNames = res.scopeNames;
+      }
+    } else if (condition.kind === "OrCondition") {
+      const res = checkOrCondition(condition.subconditions, user, usingScopes);
+      if (res.qualified) {
+        qualified = true;
+        scopeNames = res.scopeNames;
+      }
+    } else if (condition.kind === "NotCondition") {
+      const res = checkNotCondition(condition.subconditions, user, usingScopes);
+      if (res.qualified) {
+        qualified = true;
+        scopeNames = [res.scopeName];
+      }
+    } else {
+      const res = checkValueCondition(condition, user, usingScopes);
+      if (res.qualified) {
+        qualified = true;
+        scopeNames = [res.scopeName];
+      }
+    }
+    if (qualified) {
+      // +1 taking into consideration an index;
+      level = i + 1;
+      scopes = scopeNames;
+      break;
+    }
+  }
+
+  return { rank: level, scopes: scopes.filter(onlyUnique) };
 };
 
 export const personalizeOffers = (user, offers) => {
   const list = [];
   offers.forEach((offer) => {
-    const levels = offer.conditions.length;
-    let level = 0;
-    let scopes = [];
-
-    // Count from the back to find the best level.
-    for (let i = levels - 1; i >= 0; i--) {
-      const condition = offer.conditions[i];
-      let qualified = false;
-      let scopeNames = [];
-      if (condition.kind === "AndCondition") {
-        const res = checkAndCondition(condition.subconditions, user);
-        if (res.qualified) {
-          qualified = true;
-          scopeNames = res.scopeNames;
-        }
-      } else if (condition.kind === "OrCondition") {
-        const res = checkOrCondition(condition.subconditions, user);
-        if (res.qualified) {
-          qualified = true;
-          scopeNames = res.scopeNames;
-        }
-      } else if (condition.kind === "NotCondition") {
-        const res = checkNotCondition(condition.subconditions, user);
-        if (res.qualified) {
-          qualified = true;
-          scopeNames = [res.scopeName];
-        }
-      } else {
-        const res = checkValueCondition(condition, user);
-        if (res.qualified) {
-          qualified = true;
-          scopeNames = [res.scopeName];
-        }
-      }
-      if (qualified) {
-        // +1 taking into consideration an index;
-        level = i + 1;
-        scopes = scopeNames;
-        break;
-      }
-    }
+    // This uses all the scopes
+    const result = evaluateOffer(user, offer.conditions, scopeNames);
 
     const formattedOffer = {
       ...offer,
       evaluation_result: {
-        rank: level,
-        used_scopes: scopes,
+        rank: result.rank,
+        used_scopes: result.scopes,
         required_scopes: offer.campaign.consumer.scopes,
       }
     };
-    list.push(formattedOffer);
+
+    if (result.rank > 0) {
+      // Return only qualified offers
+      list.push(formattedOffer);
+    }
   });
   return list;
 };

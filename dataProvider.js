@@ -1,4 +1,4 @@
-import {composeClaimObject, personalizeOffers, scopeNames} from "./utils";
+import {composeClaimObject, evaluateOffer, personalizeOffers, scopeNames} from "./utils";
 
 const faker = require("faker");
 const { Router } = require("express");
@@ -92,14 +92,38 @@ module.exports = ({ db, credify }) => {
 
   // This is called by Credify's Backend.
   api.post("/user-counts", async (req, res) => {
-    // TODO: query data provider's database to count the number of eligible users.
+    const ids = req.body.credify_ids;
+    const conditions = req.body.conditions;
+    if (ids === undefined || !conditions) {
+      return res.status(400).send({ message: "Invalid body" });
+    }
 
-    const response = {
-      data: {
-        counts: [1000, 500]
-      }
-    };
-    res.json(response);
+    try {
+      const users = await db.User.findAll({
+        where: {
+          [Op.not]: [
+            { 'credify_id': ids },
+          ]
+        }
+      });
+
+      let counts = new Array(conditions.length);
+
+      users.forEach((user) => {
+        const res = evaluateOffer(user, req.body.conditions, scopeNames);
+        counts[res.rank - 1] += 1;
+      });
+
+      const response = {
+        data: {
+          counts
+        }
+      };
+      res.json(response);
+    } catch (e) {
+      res.status(500).send({ message: e.message });
+    }
+
   });
 
   // This is called by Credify's Backend.
@@ -115,13 +139,11 @@ module.exports = ({ db, credify }) => {
       }
       const user = users[0];
 
-      // TODO: compare the condition with this user's data.
-      console.log(user);
-      const level = 2;
+      const result = evaluateOffer(user, req.body.conditions, req.body.scopes);
 
       const response = {
         data: {
-          level
+          level: result.rank
         }
       };
       res.json(response);
