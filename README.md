@@ -93,13 +93,7 @@ Query parameters:
 - `credify_id (string | undefined)`
 - `offer_code (string | undefined)`
 
-Response body:
-
-```json
-{
-  "url": "https://dev-oidc-core.credify.one/oauth2/auth?client_id=..."    
-}
-```
+This redirects the request to OIDC.
 
 [Here is its detail](https://developers.credify.one/how-to-use-servicex/be-data-receiver.html#oidc-setup-url).
 
@@ -135,6 +129,21 @@ $ yarn start
 
 Default port is 8000.
 
+
+## Deployment
+
+This project uses Heroku, and merging to the master branch will kick off the deployment process.
+
+```shell script
+# DB migration
+$ heroku run yarn db:migrate
+
+# DB seed data removal
+$ heroku run yarn db:seed:reset
+
+# DB seed data generation
+$ heroku run yarn db:seed:all
+```
 
 ## Scopes definition
 
