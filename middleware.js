@@ -1,6 +1,6 @@
 const { Router } = require('express');
 
-module.exports = ({ db, credify }) => {
+module.exports = ({ db, dp, dr }) => {
   const routes = Router();
 
   // Add something if needed...

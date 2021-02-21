@@ -1,6 +1,6 @@
 const { Router } = require("express");
 
-const organizationId = "37c5abfa-a4b7-4521-a312-89a2ec53e804";
+const organizationId = "b9406c85-1f03-49ae-a44e-445750be5971";
 const redirectUrl = "http://localhost:3000/callback";
 const scopes = ["openid", "phone", "email", "profile"];
 
