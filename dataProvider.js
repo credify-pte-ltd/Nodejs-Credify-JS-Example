@@ -1,4 +1,4 @@
-import {composeClaimObject, evaluateOffer, personalizeOffers, scopeNames} from "./utils";
+const {composeClaimObject, evaluateOffer, personalizeOffers, scopeNames} = require("./utils");
 
 const faker = require("faker");
 const { Router } = require("express");

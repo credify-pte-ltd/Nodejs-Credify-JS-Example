@@ -2,7 +2,7 @@ const onlyUnique = (value, index, self) => {
   return self.indexOf(value) === index;
 };
 
-export const scopeNames = ["37c5abfa-a4b7-4521-a312-89a2ec53e804:credit-score", "37c5abfa-a4b7-4521-a312-89a2ec53e804:transactions"];
+const scopeNames = ["37c5abfa-a4b7-4521-a312-89a2ec53e804:credit-score", "37c5abfa-a4b7-4521-a312-89a2ec53e804:transactions"];
 const scopesDefinition =
   [
     {
@@ -135,7 +135,7 @@ const scopesDefinition =
     }
   ];
 
-export const composeClaimObject = (user, scopes) => {
+const composeClaimObject = (user, scopes) => {
   const claims = {};
   if (scopes.includes("37c5abfa-a4b7-4521-a312-89a2ec53e804:credit-score")) {
     claims["37c5abfa-a4b7-4521-a312-89a2ec53e804:credit-score"] = {
@@ -236,7 +236,7 @@ const checkNotCondition = (subconditions, user, usingScopes) => {
   return { qualified: !qualified, scopeName };
 };
 
-export const evaluateOffer = (user, conditions, usingScopes) => {
+const evaluateOffer = (user, conditions, usingScopes) => {
   let level = 0;
   let scopes = [];
 
@@ -281,7 +281,7 @@ export const evaluateOffer = (user, conditions, usingScopes) => {
   return { rank: level, scopes: scopes.filter(onlyUnique) };
 };
 
-export const personalizeOffers = (user, offers) => {
+const personalizeOffers = (user, offers) => {
   const list = [];
   offers.forEach((offer) => {
     // This uses all the scopes
@@ -302,4 +302,11 @@ export const personalizeOffers = (user, offers) => {
     }
   });
   return list;
+};
+
+module.exports = {
+  personalizeOffers,
+  evaluateOffer,
+  scopeNames,
+  composeClaimObject,
 };
