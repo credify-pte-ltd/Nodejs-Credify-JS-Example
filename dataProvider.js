@@ -1,5 +1,6 @@
 const {composeClaimObject, evaluateOffer, personalizeOffers, scopeNames} = require("./utils");
 
+const { Op } = require('sequelize');
 const faker = require("faker");
 const { Router } = require("express");
 
@@ -52,7 +53,7 @@ module.exports = ({ db, credify }) => {
       console.log(commitments);
       // TODO: store 'commitments' to DB
 
-      res.send({ id });
+      res.json({ id });
     } catch (e) {
       res.status(500).send({ message: e.message });
     }
@@ -92,8 +93,9 @@ module.exports = ({ db, credify }) => {
 
   // This is called by Credify's Backend.
   api.post("/user-counts", async (req, res) => {
-    const ids = req.body.credify_ids;
+    const ids = req.body.ids;
     const conditions = req.body.conditions;
+
     if (ids === undefined || !conditions) {
       return res.status(400).send({ message: "Invalid body" });
     }
@@ -101,17 +103,19 @@ module.exports = ({ db, credify }) => {
     try {
       const users = await db.User.findAll({
         where: {
-          [Op.not]: [
-            { 'credify_id': ids },
-          ]
+          'credifyId': {
+            [Op.notIn]: ids, // remove users who have used an offer to this data receiver.
+          },
         }
       });
 
-      let counts = new Array(conditions.length);
+      let counts = Array(conditions.length).fill(0);
 
       users.forEach((user) => {
-        const res = evaluateOffer(user, conditions, scopeNames);
-        counts[res.rank - 1] += 1;
+        for (let i = 0; i < conditions.length; i++) {
+          const res = evaluateOffer(user, [conditions[i]], scopeNames);
+          counts[i] += res.rank;
+        }
       });
 
       const response = {
@@ -123,7 +127,6 @@ module.exports = ({ db, credify }) => {
     } catch (e) {
       res.status(500).send({ message: e.message });
     }
-
   });
 
   // This is called by Credify's Backend.

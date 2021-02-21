@@ -16,6 +16,7 @@ module.exports = {
     const users = [];
     for (let i = 0; i < USER_COUNT; i++) {
       const data = {
+        id: i + 1,
         firstName: faker.name.firstName(),
         lastName: faker.name.lastName(),
         email: faker.internet.email(),

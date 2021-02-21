@@ -154,6 +154,20 @@ const composeClaimObject = (user, scopes) => {
   return claims;
 };
 
+const lookUpScopeNameByClaimName = (claimName) => {
+  let scopeName = ""
+  scopesDefinition.forEach((s) => {
+    if (scopeName) { return; }
+    s.claims.forEach((c) => {
+      if (c.name === claimName) {
+        scopeName = s.name;
+        return;
+      }
+    })
+  });
+  return scopeName;
+}
+
 /**
  *
  * @param condition
@@ -162,48 +176,49 @@ const composeClaimObject = (user, scopes) => {
  * @returns {{qualified: boolean, scopeName: string}}
  */
 const checkValueCondition = (condition, user, usingScopes) => {
-  const userDeclined = !usingScopes.includes(condition.claim.scope.name);
+  const scopeName = lookUpScopeNameByClaimName(condition.claim.name);
+  const userDeclined = !usingScopes.includes(scopeName);
   if (userDeclined) {
-    return { qualified: false, scopeName: condition.claim.scope.name };
+    return { qualified: false, scopeName };
   }
 
   if (condition.kind === "ContainCondition") {
-    return { qualified: true, scopeName: condition.claim.scope.name };
+    return { qualified: true, scopeName };
   }
 
   if (condition.kind === "InRangeCondition") {
     if (condition.claim.name === "37c5abfa-a4b7-4521-a312-89a2ec53e804:score") {
       const qualified = user.creditScore >= Number(condition.value) && user.creditScore <= Number(condition.upper);
-      return { qualified, scopeName: condition.claim.scope.name };
+      return { qualified, scopeName };
     }
     if (condition.claim.name === "37c5abfa-a4b7-4521-a312-89a2ec53e804:total-count") {
       const qualified = user.transactionsCount >= Number(condition.value) && user.transactionsCount <= Number(condition.upper);
-      return { qualified, scopeName: condition.claim.scope.name };
+      return { qualified, scopeName };
     }
     if (condition.claim.name === "37c5abfa-a4b7-4521-a312-89a2ec53e804:monthly-payment-amount") {
       const qualified = user.monthlyPaymentAmount >= Number(condition.value) && user.monthlyPaymentAmount <= Number(condition.upper);
-      return { qualified, scopeName: condition.claim.scope.name };
+      return { qualified, scopeName };
     }
-    return { qualified: false, scopeName: condition.claim.scope.name };
+    return { qualified: false, scopeName };
   }
 
   if (condition.kind === "LargerThanCondition") {
     // No condition that falls into this.
-    return { qualified: false, scopeName: condition.claim.scope.name };
+    return { qualified: false, scopeName };
   }
 
   if (condition.kind === "LargerThanEqualCondition") {
     // No condition that falls into this.
-    return { qualified: false, scopeName: condition.claim.scope.name };
+    return { qualified: false, scopeName };
   }
 
-  if (condition.kind === "EqualCondition") {
+  if (condition.kind === "EqualityCondition") {
     if (condition.claim.name === "37c5abfa-a4b7-4521-a312-89a2ec53e804:fraud") {
       const qualified = !Boolean(condition.value);
-      return { qualified, scopeName: condition.claim.scope.name };
+      return { qualified, scopeName };
     }
   }
-  return { qualified: false, scopeName: condition.claim.scope.name };
+  return { qualified: false, scopeName };
 };
 
 const checkAndCondition = (subconditions, user, usingScopes) => {
@@ -240,7 +255,11 @@ const evaluateOffer = (user, conditions, usingScopes) => {
   let level = 0;
   let usedScopes = [];
   const requestedScopes = conditions.flatMap((c) => {
-    return c.subconditions.map((c) => c.claim.scope.name)
+    if (c.subconditions) {
+      return c.subconditions.flatMap((sb) => lookUpScopeNameByClaimName(sb.claim.name))
+    } else {
+      return lookUpScopeNameByClaimName(c.claim.name);
+    }
   }).filter(onlyUnique);
 
   // Count from the back to find the best level.

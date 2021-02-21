@@ -6,6 +6,7 @@
   "author": "@ngo275",
   "license": "MIT",
   "scripts": {
+    "dev": "nodemon app.js",
     "start": "node app.js",
     "db:setup": "yarn run db:migrate && yarn run db:seed:all",
     "sequelize": "sequelize --models-path=src/models",
@@ -35,5 +36,8 @@
     "pg-hstore": "^2.3.3",
     "sequelize": "^6.5.0",
     "sequelize-cli": "^6.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
   }
 }
