@@ -24,11 +24,11 @@ MC4CAQAwBQYDK2VwBCIEIGSTUi4/MKS6laRoj5Cirazy2gkKpBu6c0I6c/TXUvQu
 };
 const dataReceiverConfig = {
   signingPrivateKey: `-----BEGIN PRIVATE KEY-----
-MC4CAQAwBQYDK2VwBCIEIABkaJ1reetSmR+9JaPSNwc9xwrt8xGB+JHrChmu67gk
------END PRIVATE KEY-----`,
-  apiKey: "5003Oa4jPvqrT07ivhd8m0D0yiCBtTnqJYniZGnx69d2MswnnMyYLDWNQWQPTz5r",
-  email: "Leif55@gmail.com",
-  password: "Mfnnbmuiuu18@",
+  MC4CAQAwBQYDK2VwBCIEIN6LT1I4RRSLiWLHyRdrn/OSSgTzpbiijgVvT7y46S2w
+  -----END PRIVATE KEY-----`,
+  apiKey: "wm7fFfWkVnkvvkjR3lv0JknI89xRvu3nr3pxSFmMSe2DqlW5MuRXcujata7OGafQ",
+  email: "Ila43@gmail.com",
+  password: "Sjypajfhwp605@",
 };
 
 
