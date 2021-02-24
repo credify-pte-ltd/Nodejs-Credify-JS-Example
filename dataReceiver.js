@@ -9,8 +9,8 @@ module.exports = ({ db, credify }) => {
 
   api.get('/oidc', async (req, res) => {
     const state = Math.random().toString();
-    // const options = { state, responseMode: "form_post", responseType: "code" };
-    const options = { state };
+    const options = { state, responseMode: "fragment", responseType: "token" };
+    // const options = { state };
     if (req.query.phone_number) {
       options.phoneNumber = req.query.phone_number;
     } else if (req.query.credify_id) {
