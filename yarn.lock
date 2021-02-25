@@ -557,10 +557,10 @@ credify-crypto@^0.27.3:
     node-forge "^0.10.0"
     wif "^2.0.6"
 
-credify-nodejs@^0.2.14:
-  version "0.2.14"
-  resolved "https://registry.yarnpkg.com/credify-nodejs/-/credify-nodejs-0.2.14.tgz#98e79117ff2c4b49f089b35dc0073513a82ad6e6"
-  integrity sha512-EnBWJWnAUpjHnOY6gmjJ9gUd7co2cfGgqTcF307l7s7nsiiL/EvvnjESH2nDgtqWU8pMOWBAx6ysHuVpjbuumg==
+credify-nodejs@^0.2.17:
+  version "0.2.17"
+  resolved "https://registry.yarnpkg.com/credify-nodejs/-/credify-nodejs-0.2.17.tgz#895f86055d9cdf103f30b795f383355c19807981"
+  integrity sha512-EFk/59l7NBX12YhyHhqaIrMM1tHpt9p4AI+Fu+hRczVbTRo6I956DNLloy5Ou4fmJvGq+nCTEPSVcnFf0K6DeQ==
   dependencies:
     axios "^0.21.1"
     credify-crypto "^0.27.3"
