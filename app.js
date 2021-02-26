@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const Credify = require("credify-nodejs");
+const { Credify } = require("credify-nodejs");
 const middleware = require("./middleware");
 const db = require("./database/models");
 const dataProvider = require("./dataProvider");

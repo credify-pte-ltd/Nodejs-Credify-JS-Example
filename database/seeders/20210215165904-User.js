@@ -1,4 +1,5 @@
 const faker = require("faker");
+const { sha256 } = require("credify-nodejs");
 
 const USER_COUNT = 5000;
 
@@ -15,13 +16,15 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     const users = [];
     for (let i = 0; i < USER_COUNT; i++) {
+      const phoneNumber = generateRandomVnPhoneNumber();
       const data = {
         id: i + 1,
         firstName: faker.name.firstName(),
         lastName: faker.name.lastName(),
         email: faker.internet.email(),
-        phoneNumber: generateRandomVnPhoneNumber(),
+        phoneNumber,
         phoneCountryCode: "+84",
+        hashedPhoneNumber: sha256(`84${phoneNumber}`),
         creditScore: faker.random.number(500),
         socialScore: faker.random.number(300),
         transactionsCount: faker.random.number(1000),

@@ -60,24 +60,32 @@ module.exports = ({ db, credify }) => {
   });
 
   // This is called by Credify's Backend.
-  api.get("/offers-list", async (req, res) => {
-    const credifyId = req.query.credify_id;
-    if (!credifyId) {
-      return res.status(400).send({ message: "Query param is not valid" });
+  api.get("/offers-filtering", async (req, res) => {
+    const credifyId = req.body.credify_id;
+    const localId = req.body.local_id;
+    const offers = req.body.offers;
+    if (!credifyId && !localId) {
+      return res.status(400).send({ message: "No ID found" });
+    }
+    if (offers === undefined) {
+      return res.status(400).send({ message: "Invalid body" });
     }
 
     try {
-      const offers = await credify.offer.getList();
-
       if (!offers.length) {
         return res.send({ offers: [] })
       }
+      let user;
 
-      const users = await db.User.findAll({ where: { credifyId } });
-      if (users.length !== 1) {
-        throw new Error("Not found user properly");
+      if (credifyId) {
+        const users = await db.User.findAll({ where: { credifyId } });
+        if (users.length !== 1) {
+          throw new Error("Not found user properly");
+        }
+        user = users[0];
+      } else if (localId) {
+        user = await db.User.findByPk(localId);
       }
-      const user = users[0];
       const personalizedOffers = personalizeOffers(user, offers);
 
       const response = {

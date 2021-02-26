@@ -62,5 +62,24 @@ module.exports = ({ db, credify }) => {
     }
   });
 
+  api.get("/user-existence", async (req, res) => {
+    const phoneNumber = req.query.phone_number;
+    const idNumber = req.query.id_number;
+    const document = req.query.id_document;
+    if (!phoneNumber && !idNumber && !document) {
+      return res.status(400).send({ message: "Invalid query" });
+    }
+    if (!phoneNumber) {
+      return res.status(403).send({ message: "This does not support checking with ID" });
+    }
+    try {
+      const r = await db.User.findAll({ where: { hashedPhoneNumber: phoneNumber } });
+      const exists = r.length > 0;
+      res.send({ data: { exists } });
+    } catch (e) {
+      res.status(500).send(e);
+    }
+  });
+
   return api;
 };
