@@ -153,7 +153,7 @@ This project uses Heroku, and merging to the master branch will kick off the dep
 $ heroku run yarn db:migrate
 
 # DB seed data removal
-$ heroku run yarn db:seed:reset
+$ heroku run yarn db:seed:redo
 
 # DB seed data generation
 $ heroku run yarn db:seed:all
