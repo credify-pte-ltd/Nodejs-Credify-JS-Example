@@ -156,7 +156,7 @@ module.exports = ({ db, credify }) => {
         data: {
           rank: result.rank,
           used_scopes: result.usedScopes,
-          required_scopes: result.requiredScopes,
+          requested_scopes: result.requestedScopes,
         }
       };
       res.json(response);

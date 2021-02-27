@@ -296,7 +296,7 @@ const evaluateOffer = (user, conditions, usingScopes) => {
     }
   }
 
-  return { rank: level, usedScopes, requiredScopes: requestedScopes };
+  return { rank: level, usedScopes, requestedScopes };
 };
 
 const personalizeOffers = (user, offers) => {
@@ -310,7 +310,7 @@ const personalizeOffers = (user, offers) => {
       evaluation_result: {
         rank: result.rank,
         used_scopes: result.usedScopes,
-        required_scopes: result.requiredScopes,
+        requested_scopes: result.requestedScopes,
       }
     };
 
