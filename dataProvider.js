@@ -47,12 +47,13 @@ module.exports = ({ db, credify }) => {
       const id = await credify.entity.create(profile, password);
       await user.update({ credifyId: id });
 
+      /** Disable this for now.
       const claims = composeClaimObject(user, scopeNames);
       const commitments = await credify.claims.push(id, claims);
 
       console.log(commitments);
       // TODO: store 'commitments' to DB
-
+**/
       res.json({ id });
     } catch (e) {
       res.status(500).send({ message: e.message });
