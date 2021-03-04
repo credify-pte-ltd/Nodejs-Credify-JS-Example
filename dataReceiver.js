@@ -1,8 +1,9 @@
 const { Router } = require("express");
+const {dataReceiverConfig} = require("./app");
 
-const organizationId = "53709064-546a-49c9-977f-aaa5ccb6cd19";
-const redirectUrl = "http://localhost:3000/callback";
-const scopes = ["openid", "phone", "email", "profile"];
+const organizationId = dataReceiverConfig.id;
+const redirectUrl = dataReceiverConfig.redirectUrl;
+const scopes = dataReceiverConfig.scopes;
 
 module.exports = ({ db, credify }) => {
   const api = Router();
