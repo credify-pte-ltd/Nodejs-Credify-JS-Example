@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const {dataReceiverConfig} = require("./app");
+const {dataReceiverConfig} = require("./config");
 
 const organizationId = dataReceiverConfig.id;
 const redirectUrl = dataReceiverConfig.redirectUrl;
