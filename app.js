@@ -18,9 +18,9 @@ const port = process.env.PORT || 8000;
 
 const dataProviderConfig = {
   signingPrivateKey: `-----BEGIN PRIVATE KEY-----
-MC4CAQAwBQYDK2VwBCIEIGSTUi4/MKS6laRoj5Cirazy2gkKpBu6c0I6c/TXUvQu
------END PRIVATE KEY-----`,
-  apiKey: "DNLYHGAjm1VW6kJykit5Jn0XNdI5lmQY5m6wAbgIU7h4L1jUIFRr4HqeOsmvLevW",
+  MC4CAQAwBQYDK2VwBCIEIIEmS6biY6oGC6sR5vZEBcjKe1Z0cVhJW78yf7pZobp7
+  -----END PRIVATE KEY-----`,
+  apiKey: "vEKTWiDqLLKr8mxIOLQq0hypkCoxw3fUbFPYHgb4ZrYQMjVRs5RnSzY9NMoOXBBS",
 };
 const dataReceiverConfig = {
   signingPrivateKey: `-----BEGIN PRIVATE KEY-----
