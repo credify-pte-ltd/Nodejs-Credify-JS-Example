@@ -543,10 +543,10 @@ create-hmac@^1.1.4:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
-credify-crypto@^0.27.3:
-  version "0.27.3"
-  resolved "https://registry.yarnpkg.com/credify-crypto/-/credify-crypto-0.27.3.tgz#111db51f8c7d6680c54110927541be1fc6c5ba0f"
-  integrity sha512-T5GuYUPf34U0PuRMWG4xSHJBS0a89xeDJYHFj+hykzozknXXDkV8zS85vAH20NzdNR7tXTMvkUtwQ7ZWjMu2Jg==
+credify-crypto@^0.30.0:
+  version "0.30.0"
+  resolved "https://registry.yarnpkg.com/credify-crypto/-/credify-crypto-0.30.0.tgz#71060a0b534f7e4feb76d5190b617f84ebc39fda"
+  integrity sha512-f931ghnxl+Lf3YbPJCiZnZLUoC5IS8YH/xNNYri47kvwcQVf3C7yUEkqNV+g+TFM/9g2C0Of8bMlFqh69zyQ+A==
   dependencies:
     "@credify/crypto-key-composer" "^0.1.3"
     "@peculiar/webcrypto" "^1.1.4"
@@ -557,13 +557,13 @@ credify-crypto@^0.27.3:
     node-forge "^0.10.0"
     wif "^2.0.6"
 
-credify-nodejs@^0.2.21:
-  version "0.2.21"
-  resolved "https://registry.yarnpkg.com/credify-nodejs/-/credify-nodejs-0.2.21.tgz#cbac2055d84bc05a6fce07528442c25cb3275fb2"
-  integrity sha512-dOW3aZ5g6cOSKwMpetJniCOZNTLG1u2W9MyTBx+XHFV1ZKCN9X61cfERc2v3ZZDLyQTDfxgOHEOA/p3iRKb5Nw==
+credify-nodejs@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/credify-nodejs/-/credify-nodejs-0.3.0.tgz#90bb2640b466fd491611153205f8bfb0f33328ea"
+  integrity sha512-sHh1exqloMXPygWX9G/AEjA3uKEmWnbzWqKlvN80f4kRNtOUZSm63MLvHciKPu6XFTL/KdyvDb8TN+QwEpBtBg==
   dependencies:
     axios "^0.21.1"
-    credify-crypto "^0.27.3"
+    credify-crypto "^0.30.0"
 
 crypto-random-string@^2.0.0:
   version "2.0.0"
