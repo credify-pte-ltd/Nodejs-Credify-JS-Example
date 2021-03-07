@@ -121,9 +121,9 @@ module.exports = ({ db, credify }) => {
       let counts = Array(conditions.length).fill(0);
 
       users.forEach((user) => {
-        for (let i = 0; i < conditions.length; i++) {
-          const res = evaluateOffer(user, [conditions[i]], scopeNames);
-          counts[i] += res.rank;
+        const res = evaluateOffer(user, conditions, scopeNames);
+        if (res.rank > 0) {
+          counts[res.rank - 1] += 1;
         }
       });
 

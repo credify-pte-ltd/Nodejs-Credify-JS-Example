@@ -173,82 +173,94 @@ const lookUpScopeNameByClaimName = (claimName) => {
  * @param condition
  * @param user
  * @param usingScopes Scope name list that user is going to share
- * @returns {{qualified: boolean, scopeName: string}}
+ * @returns {{qualified: boolean, scopeNames: string[]}}
  */
 const checkValueCondition = (condition, user, usingScopes) => {
   const scopeName = lookUpScopeNameByClaimName(condition.claim.name);
   const userDeclined = !usingScopes.includes(scopeName);
   if (userDeclined) {
-    return { qualified: false, scopeName };
+    return { qualified: false, scopeNames: [scopeName] };
   }
 
   if (condition.kind === "ContainCondition") {
-    return { qualified: true, scopeName };
+    return { qualified: true, scopeNames: [scopeName] };
   }
 
   if (condition.kind === "InRangeCondition") {
     if (condition.claim.name === "37c5abfa-a4b7-4521-a312-89a2ec53e804:score") {
       const qualified = user.creditScore >= Number(condition.value) && user.creditScore <= Number(condition.upper);
-      return { qualified, scopeName };
+      return { qualified, scopeNames: [scopeName] };
     }
     if (condition.claim.name === "37c5abfa-a4b7-4521-a312-89a2ec53e804:total-count") {
       const qualified = user.transactionsCount >= Number(condition.value) && user.transactionsCount <= Number(condition.upper);
-      return { qualified, scopeName };
+      return { qualified, scopeNames: [scopeName] };
     }
     if (condition.claim.name === "37c5abfa-a4b7-4521-a312-89a2ec53e804:monthly-payment-amount") {
       const qualified = user.monthlyPaymentAmount >= Number(condition.value) && user.monthlyPaymentAmount <= Number(condition.upper);
-      return { qualified, scopeName };
+      return { qualified, scopeNames: [scopeName] };
     }
-    return { qualified: false, scopeName };
+    return { qualified: false, scopeNames: [scopeName] };
   }
 
   if (condition.kind === "LargerThanCondition") {
     // No condition that falls into this.
-    return { qualified: false, scopeName };
+    return { qualified: false, scopeNames: [scopeName] };
   }
 
   if (condition.kind === "LargerThanEqualCondition") {
     // No condition that falls into this.
-    return { qualified: false, scopeName };
+    return { qualified: false, scopeNames: [scopeName] };
   }
 
   if (condition.kind === "EqualityCondition") {
     if (condition.claim.name === "37c5abfa-a4b7-4521-a312-89a2ec53e804:fraud") {
       const qualified = !Boolean(condition.value);
-      return { qualified, scopeName };
+      return { qualified, scopeNames: [scopeName] };
     }
   }
-  return { qualified: false, scopeName };
+  return { qualified: false, scopeNames: [scopeName] };
 };
 
 const checkAndCondition = (subconditions, user, usingScopes) => {
-  const scopeNames = [];
+  let totalScopeNames = [];
   const validConditions = subconditions.filter((c) => {
-    const { qualified, scopeName } = checkValueCondition(c, user, usingScopes);
-    if (qualified) { scopeNames.push(scopeName) }
+    const { qualified, scopeNames } = check(c, user, usingScopes);
+    if (qualified) { totalScopeNames = [...totalScopeNames, ...scopeNames].filter(onlyUnique) }
     return qualified;
   });
   // All the sub conditions need to meet criterion.
-  return { qualified: subconditions.length === validConditions.length, scopeNames: scopeNames.filter(onlyUnique) };
+  return { qualified: subconditions.length === validConditions.length, scopeNames: totalScopeNames };
 };
 
 const checkOrCondition = (subconditions, user, usingScopes) => {
-  const scopeNames = [];
+  let totalScopeNames = [];
   const validConditions = subconditions.filter((c) => {
-    const { qualified, scopeName } = checkValueCondition(c, user, usingScopes);
-    if (qualified) { scopeNames.push(scopeName) }
+    const { qualified, scopeNames } = check(c, user, usingScopes);
+    if (qualified) { totalScopeNames = [...totalScopeNames, ...scopeNames].filter(onlyUnique) }
     return qualified;
   });
   // One of the sub conditions need to meet criterion.
-  return { qualified: validConditions.length > 0, scopeNames: scopeNames.filter(onlyUnique) };
+  return { qualified: validConditions.length > 0, scopeNames: totalScopeNames };
 };
 
 const checkNotCondition = (subconditions, user, usingScopes) => {
   if (subconditions.length !== 1) {
     return false;
   }
-  const { qualified, scopeName } = checkValueCondition(subconditions[0], user, usingScopes);
-  return { qualified: !qualified, scopeName };
+  const { qualified, scopeNames } = checkValueCondition(subconditions[0], user, usingScopes);
+  return { qualified: !qualified, scopeNames };
+};
+
+const check = (condition, user, usingScopes) => {
+  if (condition.kind === "AndCondition") {
+    return checkAndCondition(condition.subconditions, user, usingScopes);
+  } else if (condition.kind === "OrCondition") {
+    return checkOrCondition(condition.subconditions, user, usingScopes);
+  } else if (condition.kind === "NotCondition") {
+    return checkNotCondition(condition.subconditions, user, usingScopes);
+  } else {
+    return checkValueCondition(condition, user, usingScopes);
+  }
 };
 
 const evaluateOffer = (user, conditions, usingScopes) => {
@@ -256,7 +268,14 @@ const evaluateOffer = (user, conditions, usingScopes) => {
   let usedScopes = [];
   const requestedScopes = conditions.flatMap((c) => {
     if (c.subconditions) {
-      return c.subconditions.flatMap((sb) => lookUpScopeNameByClaimName(sb.claim.name))
+      return c.subconditions.flatMap((sb) => {
+        if (sb.claim) {
+          return lookUpScopeNameByClaimName(sb.claim.name);
+        } else {
+          const innerSb = sb.subconditions[0];
+          return lookUpScopeNameByClaimName(innerSb.claim.name);
+        }
+      })
     } else {
       return lookUpScopeNameByClaimName(c.claim.name);
     }
@@ -265,34 +284,11 @@ const evaluateOffer = (user, conditions, usingScopes) => {
   // Count from the back to find the best level.
   for (let i = conditions.length - 1; i >= 0; i--) {
     const condition = conditions[i];
-    if (condition.kind === "AndCondition") {
-      const res = checkAndCondition(condition.subconditions, user, usingScopes);
-      if (res.qualified) {
-        level = i + 1;
-        usedScopes = res.scopeNames;
-        break;
-      }
-    } else if (condition.kind === "OrCondition") {
-      const res = checkOrCondition(condition.subconditions, user, usingScopes);
-      if (res.qualified) {
-        level = i + 1;
-        usedScopes = res.scopeNames;
-        break;
-      }
-    } else if (condition.kind === "NotCondition") {
-      const res = checkNotCondition(condition.subconditions, user, usingScopes);
-      if (res.qualified) {
-        level = i + 1;
-        usedScopes = [res.scopeName];
-        break;
-      }
-    } else {
-      const res = checkValueCondition(condition, user, usingScopes);
-      if (res.qualified) {
-        level = i + 1;
-        usedScopes = [res.scopeName];
-        break;
-      }
+    const { qualified, scopeNames } = check(condition, user, usingScopes);
+    if (qualified) {
+      level = i + 1;
+      usedScopes = scopeNames;
+      break;
     }
   }
 
