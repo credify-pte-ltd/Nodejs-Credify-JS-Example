@@ -3,6 +3,7 @@ const {composeClaimObject, evaluateOffer, personalizeOffers, scopeNames} = requi
 const { Op } = require('sequelize');
 const faker = require("faker");
 const { Router } = require("express");
+const { dataProviderConfig } = require("./config");
 
 module.exports = ({ db, credify }) => {
   const api = Router();
@@ -49,11 +50,11 @@ module.exports = ({ db, credify }) => {
 
       /** Disable this for now.
       const claims = composeClaimObject(user, scopeNames);
-      const commitments = await credify.claims.push(id, claims);
+      const commitments = await credify.claims.push(dataProviderConfig.id, id, claims);
 
       console.log(commitments);
       // TODO: store 'commitments' to DB
-**/
+      **/
       res.json({ id });
     } catch (e) {
       res.status(500).send({ message: e.message });
@@ -74,7 +75,12 @@ module.exports = ({ db, credify }) => {
 
     try {
       if (!offers.length) {
-        return res.send({ offers: [] })
+        const response = {
+          data: {
+            offers: [],
+          },
+        };
+        return res.status(200).json(response);
       }
       let user;
 
@@ -102,10 +108,10 @@ module.exports = ({ db, credify }) => {
 
   // This is called by Credify's Backend.
   api.post("/user-counts", async (req, res) => {
-    const ids = req.body.ids;
+    const ids = req.body.ids || [];
     const conditions = req.body.conditions;
 
-    if (ids === undefined || !conditions) {
+    if (!conditions) {
       return res.status(400).send({ message: "Invalid body" });
     }
 
@@ -137,6 +143,7 @@ module.exports = ({ db, credify }) => {
       res.status(500).send({ message: e.message });
     }
   });
+
 
   // This is called by Credify's Backend.
   api.post("/offer-evaluation", async (req, res) => {
