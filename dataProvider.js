@@ -1,4 +1,4 @@
-const {composeClaimObject, evaluateOffer, personalizeOffers, scopeNames} = require("./utils");
+const {composeClaimObject, evaluateOffer, personalizeOffers, scopeNames, extractAccessToken} = require("./utils");
 
 const { Op } = require('sequelize');
 const faker = require("faker");
@@ -48,13 +48,10 @@ module.exports = ({ db, credify }) => {
       const id = await credify.entity.create(profile, password);
       await user.update({ credifyId: id });
 
-      /** Disable this for now.
       const claims = composeClaimObject(user, scopeNames);
       const commitments = await credify.claims.push(dataProviderConfig.id, id, claims);
 
       console.log(commitments);
-      // TODO: store 'commitments' to DB
-      **/
       res.json({ id });
     } catch (e) {
       res.status(500).send({ message: e.message });
@@ -63,6 +60,11 @@ module.exports = ({ db, credify }) => {
 
   // This is called by Credify's Backend.
   api.get("/offers-filtering", async (req, res) => {
+    const token = extractAccessToken(req);
+    const isValid = await credify.auth.introspectToken(token, "claim_provider:read_filtered_offers");
+    if (!isValid) {
+      return res.status(403).send({ message: "Unauthorized" });
+    }
     const credifyId = req.body.credify_id;
     const localId = req.body.local_id;
     const offers = req.body.offers;
@@ -108,6 +110,12 @@ module.exports = ({ db, credify }) => {
 
   // This is called by Credify's Backend.
   api.post("/user-counts", async (req, res) => {
+    const token = extractAccessToken(req);
+    const isValid = await credify.auth.introspectToken(token, "oidc_client:read_user_counts");
+    if (!isValid) {
+      return res.status(403).send({ message: "Unauthorized" });
+    }
+
     const ids = req.body.ids || [];
     const conditions = req.body.conditions;
 
@@ -147,6 +155,12 @@ module.exports = ({ db, credify }) => {
 
   // This is called by Credify's Backend.
   api.post("/offer-evaluation", async (req, res) => {
+    const token = extractAccessToken(req);
+    const isValid = await credify.auth.introspectToken(token, "individual:read_evaluated_offer");
+    if (!isValid) {
+      return res.status(403).send({ message: "Unauthorized" });
+    }
+
     if (!req.body.credify_id || !req.body.conditions || !req.body.scopes) {
       return res.status(400).send({ message: "Invalid body" });
     }

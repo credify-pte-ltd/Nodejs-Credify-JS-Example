@@ -1,5 +1,6 @@
 const { Router } = require("express");
 const {dataReceiverConfig} = require("./config");
+const { extractAccessToken } = require("./utils");
 
 const organizationId = dataReceiverConfig.id;
 const redirectUrl = dataReceiverConfig.redirectUrl;
@@ -64,6 +65,12 @@ module.exports = ({ db, credify }) => {
   });
 
   api.get("/user-existence", async (req, res) => {
+    const token = extractAccessToken(req);
+    const isValid = await credify.auth.introspectToken(token, "claim_provider:read_user_existence");
+    if (!isValid) {
+      return res.status(403).send({ message: "Unauthorized" });
+    }
+
     const phoneNumber = req.query.phone_number;
     const idNumber = req.query.id_number;
     const document = req.query.id_document;

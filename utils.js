@@ -318,9 +318,25 @@ const personalizeOffers = (user, offers) => {
   return list;
 };
 
+const extractAccessToken = (req) => {
+  const bearerHeader = req.headers['authorization'];
+
+  if (bearerHeader) {
+    const bearer = bearerHeader.split(' ');
+    if (bearer.length === 2) {
+      return bearer[1];
+    }
+    return "";
+  } else {
+    // Forbidden
+    return "";
+  }
+};
+
 module.exports = {
   personalizeOffers,
   evaluateOffer,
   scopeNames,
   composeClaimObject,
+  extractAccessToken,
 };
