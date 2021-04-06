@@ -1,15 +1,17 @@
 const { Router } = require("express");
 const {dataReceiverConfig} = require("./config");
 const { extractAccessToken } = require("./utils");
+const { Credify } = require("@credify/nodejs");
 
 const organizationId = dataReceiverConfig.id;
 const redirectUrl = dataReceiverConfig.redirectUrl;
 const scopes = dataReceiverConfig.scopes;
 
-module.exports = ({ db, credify }) => {
+module.exports = ({ db }) => {
   const api = Router();
 
   api.get('/oidc', async (req, res) => {
+    const credify = await Credify.create(dataReceiverConfig.signingPrivateKey, dataReceiverConfig.apiKey, { mode: "development" });
     const state = Math.random().toString();
     // const options = { state, responseMode: "fragment", responseType: "token" };
     const options = { state };
@@ -40,6 +42,7 @@ module.exports = ({ db, credify }) => {
   });
 
   api.post("/oidc", async (req, res) => {
+    const credify = await Credify.create(dataReceiverConfig.signingPrivateKey, dataReceiverConfig.apiKey, { mode: "development" });
     if (!req.body.access_token || !req.body.state) {
       return res.status(400).send({ message: "Invalid body" });
     }
@@ -65,6 +68,7 @@ module.exports = ({ db, credify }) => {
   });
 
   api.get("/user-existence", async (req, res) => {
+    const credify = await Credify.create(dataReceiverConfig.signingPrivateKey, dataReceiverConfig.apiKey, { mode: "development" });
     const token = extractAccessToken(req);
     const isValid = await credify.auth.introspectToken(token, "claim_provider:read_user_existence");
     if (!isValid) {

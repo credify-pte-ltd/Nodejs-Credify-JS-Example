@@ -17,6 +17,28 @@
     node-forge "^0.8.1"
     rollup-plugin-delete "^2.0.0"
 
+"@credify/crypto@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@credify/crypto/-/crypto-1.0.0.tgz#1791f6d6e727ee7eddd24f7423d28b06aea402ec"
+  integrity sha512-VZuXFtGMRv9LGSzgQtppXsB74obKGUtvQKRb7QqkLsGo0zAS/bXqEhKFPgnFD4S8k+aOhAetUnxVhS2iJgbyxw==
+  dependencies:
+    "@credify/crypto-key-composer" "^0.1.3"
+    "@peculiar/webcrypto" "^1.1.4"
+    bip39 "^3.0.3"
+    elliptic "^6.5.3"
+    eosjs "^21.0.3"
+    hdkey "^2.0.1"
+    node-forge "^0.10.0"
+    wif "^2.0.6"
+
+"@credify/nodejs@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@credify/nodejs/-/nodejs-1.0.1.tgz#e924e50983bef61d0045ba868994a6fd6fa988b5"
+  integrity sha512-XiBUhSZIdQw6B0RT1DQ7PoHoVpFI6kSYuLdweCpHfysncx3TEVTwxCcUD0RFQImGPA1N6MGaTKNOVQabEMG8wg==
+  dependencies:
+    "@credify/crypto" "^1.0.0"
+    axios "^0.21.1"
+
 "@lordvlad/asn1.js@^5.1.1":
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/@lordvlad/asn1.js/-/asn1.js-5.1.1.tgz#468d5ff5f9045e0951a7d0e89a33e5f26a252df3"
@@ -542,28 +564,6 @@ create-hmac@^1.1.4:
     ripemd160 "^2.0.0"
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
-
-credify-crypto@^0.32.10:
-  version "0.32.10"
-  resolved "https://registry.yarnpkg.com/credify-crypto/-/credify-crypto-0.32.10.tgz#0aa0839581db2eef13f26b27d225e9937fd5c023"
-  integrity sha512-nBS9J0RWBF01WqabWx4ynHdg72XiUlzvKZ0yjWvIqqdsbaX1WWnNwrNN5EHVonDzW4TLWzJCtj1K4iRdFXJ8Hg==
-  dependencies:
-    "@credify/crypto-key-composer" "^0.1.3"
-    "@peculiar/webcrypto" "^1.1.4"
-    bip39 "^3.0.3"
-    elliptic "^6.5.3"
-    eosjs "^21.0.3"
-    hdkey "^2.0.1"
-    node-forge "^0.10.0"
-    wif "^2.0.6"
-
-credify-nodejs@^0.7.1:
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/credify-nodejs/-/credify-nodejs-0.7.1.tgz#0923568aaf1fa90f020ee55c660c52cf44ffc594"
-  integrity sha512-jixz2grmPyoFXGJmjUp8emN3FswT8P31Af16oOu4uw7XDXK0HADiDAvaz9GBLG4gmfpLDowMa2Akf4dUjGAZIg==
-  dependencies:
-    axios "^0.21.1"
-    credify-crypto "^0.32.10"
 
 crypto-random-string@^2.0.0:
   version "2.0.0"

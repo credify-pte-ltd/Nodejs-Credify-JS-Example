@@ -2,7 +2,7 @@
 
 :link: [Developers Documentation](https://developers.credify.one/)
 
-This project is an example project of `credify-nodejs`. You can refer a [React Example Project](https://github.com/credify-pte-ltd/React-Credify-JS-Example), too.
+This project is an example project of `@credify/nodejs`. You can refer a [React Example Project](https://github.com/credify-pte-ltd/React-Credify-JS-Example), too.
 
 Deployed URL: [https://dev-credify-sample.herokuapp.com/](https://dev-credify-sample.herokuapp.com/)
 

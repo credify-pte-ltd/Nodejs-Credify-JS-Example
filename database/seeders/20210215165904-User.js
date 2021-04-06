@@ -1,5 +1,5 @@
 const faker = require("faker");
-const { sha256 } = require("credify-nodejs");
+const { sha256 } = require("@credify/nodejs");
 
 const USER_COUNT = 5000;
 

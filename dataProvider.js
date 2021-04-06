@@ -1,11 +1,12 @@
 const {composeClaimObject, evaluateOffer, personalizeOffers, scopeNames, extractAccessToken} = require("./utils");
+const { Credify } = require("@credify/nodejs");
 
 const { Op } = require('sequelize');
 const faker = require("faker");
 const { Router } = require("express");
 const { dataProviderConfig } = require("./config");
 
-module.exports = ({ db, credify }) => {
+module.exports = ({ db }) => {
   const api = Router();
 
   api.get('/demo-user', async (req, res) => {
@@ -19,6 +20,7 @@ module.exports = ({ db, credify }) => {
   });
 
   api.post("/create", async (req, res) => {
+    const credify = new Credify(dataProviderConfig.signingPrivateKey, dataProviderConfig.apiKey, { mode: "development" });
     if (!req.body.id || !req.body.password) {
       return res.status(400).send({ message: "Invalid body" });
     }
@@ -60,6 +62,7 @@ module.exports = ({ db, credify }) => {
 
   // This is called by Credify's Backend.
   api.get("/offers-filtering", async (req, res) => {
+    const credify = new Credify(dataProviderConfig.signingPrivateKey, dataProviderConfig.apiKey, { mode: "development" });
     const token = extractAccessToken(req);
     const isValid = await credify.auth.introspectToken(token, "claim_provider:read_filtered_offers");
     if (!isValid) {
@@ -110,6 +113,7 @@ module.exports = ({ db, credify }) => {
 
   // This is called by Credify's Backend.
   api.post("/user-counts", async (req, res) => {
+    const credify = new Credify(dataProviderConfig.signingPrivateKey, dataProviderConfig.apiKey, { mode: "development" });
     const token = extractAccessToken(req);
     const isValid = await credify.auth.introspectToken(token, "oidc_client:read_user_counts");
     if (!isValid) {
@@ -155,6 +159,7 @@ module.exports = ({ db, credify }) => {
 
   // This is called by Credify's Backend.
   api.post("/offer-evaluation", async (req, res) => {
+    const credify = new Credify(dataProviderConfig.signingPrivateKey, dataProviderConfig.apiKey, { mode: "development" });
     const token = extractAccessToken(req);
     const isValid = await credify.auth.introspectToken(token, "individual:read_evaluated_offer");
     if (!isValid) {
@@ -189,6 +194,7 @@ module.exports = ({ db, credify }) => {
 
   // This is called by Credify's Backend.
   api.post("/encrypted-claims", async (req, res) => {
+    const credify = new Credify(dataProviderConfig.signingPrivateKey, dataProviderConfig.apiKey, { mode: "development" });
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.split(" ")) {
       return res.status(401).send("Unauthorized");
